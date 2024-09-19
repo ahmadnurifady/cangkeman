@@ -8,9 +8,14 @@ export class MyLogger implements LoggerService {
   private logFilePath: string;
   private logFileStream: any;
 
+  private mantapJiwa(message: string) {
+    return `[20202120] - 1231NB112312 - + ${message}]`;
+  }
+
   constructor() {
     // Tentukan path untuk log
-    this.logFilePath = process.env.LOG_PATH || './src/logger/logResult/log-error.log';
+    this.logFilePath =
+      process.env.LOG_PATH || './src/logger/logResult/log-error.log';
     this.ensureLogDirectoryExists();
     this.logFileStream = this.createRotatingLogStream();
   }
@@ -42,7 +47,7 @@ export class MyLogger implements LoggerService {
 
   log(message: any, ...optionalParams: any[]) {
     this.writeLogToFile('INFO', message, optionalParams);
-    console.log(message, ...optionalParams); // Optional: Log ke console juga
+    console.log(this.mantapJiwa(message), ...optionalParams); // Optional: Log ke console juga
   }
 
   error(message: any, ...optionalParams: any[]) {

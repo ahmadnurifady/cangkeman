@@ -1,42 +1,35 @@
 import { STRING } from 'sequelize';
-import {Table, Column, Model, PrimaryKey, IsNull, AllowNull} from 'sequelize-typescript';
-
+import { Table, Column, Model } from 'sequelize-typescript';
 
 @Table({
-    tableName: 'users',
-    timestamps: true
+  tableName: 'users',
+  timestamps: true,
 })
-export class Users extends Model{
+export class Users extends Model {
+  @Column({
+    primaryKey: true,
+    unique: true,
+    field: 'id',
+    type: STRING,
+    allowNull: false,
+  })
+  id: string;
 
-    @Column({
-        primaryKey: true, 
-        unique: true, 
-        field:'id',
-        type: STRING,
-        allowNull: false
-    })
-    id: string;
+  @Column
+  userName: string;
 
-    @Column
-    userName: string;
+  @Column
+  email: string;
 
-    @Column
-    email: string;
+  @Column
+  password: string;
 
-    @Column
-    password: string;
+  @Column
+  role: string;
 
-    @Column
-    role: string;
-
-    @Column
-    totalCoin: number;
-
-
-
-};
-
-
+  @Column
+  totalCoin: number;
+}
 
 // export const User = connection.define("users", {
 //     id : {

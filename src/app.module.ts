@@ -9,8 +9,7 @@ import { DatabaseModule } from './database/database.module';
       isGlobal: true,
     }),
     UsersModule,
-    DatabaseModule
-    
-  ]
+    DatabaseModule,
+  ],
 })
 export class AppModule {}
