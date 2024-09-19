@@ -7,9 +7,10 @@ import { LOGTYPE } from './logger.domain'; // Definisikan enum LOGTYPE sesuai ke
 export class MyLogger implements LoggerService {
   private logFilePath: string;
   private logFileStream: any;
+  // private timestamp = new Date().toISOString();
 
-  private mantapJiwa(message: string) {
-    return `[20202120] - 1231NB112312 - + ${message}]`;
+  private mantapJiwa(message: string, idLogTx: string, timestamp: string) {
+    return `[${timestamp}] - ${idLogTx} - + ${message}]`;
   }
 
   constructor() {
@@ -45,9 +46,17 @@ export class MyLogger implements LoggerService {
     this.logFileStream.write(JSON.stringify(logData) + '\n');
   }
 
-  log(message: any, ...optionalParams: any[]) {
+  log(
+    message: any,
+    idLogTx: string,
+    timestamp: string,
+    ...optionalParams: any[]
+  ) {
     this.writeLogToFile('INFO', message, optionalParams);
-    console.log(this.mantapJiwa(message), ...optionalParams); // Optional: Log ke console juga
+    console.log(
+      this.mantapJiwa(message, idLogTx, timestamp),
+      ...optionalParams,
+    ); // Optional: Log ke console juga
   }
 
   error(message: any, ...optionalParams: any[]) {
@@ -75,7 +84,10 @@ export class MyLogger implements LoggerService {
     console.error(message, ...optionalParams); // Log fatal error ke console
   }
 
-  logEvent(logType: LOGTYPE, { logTitle = '', logMessage = '' }) {
+  logEvent(
+    logType: LOGTYPE,
+    { logTitle = '', logMessage = '', timestamp = '' },
+  ) {
     switch (logType) {
       case LOGTYPE.ERROR:
         this.error(logTitle, logMessage);
@@ -86,7 +98,7 @@ export class MyLogger implements LoggerService {
         break;
 
       case LOGTYPE.INFO:
-        this.log(logTitle, logMessage);
+        this.log(logTitle, logMessage, timestamp);
         break;
 
       case LOGTYPE.WARN:
