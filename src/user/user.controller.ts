@@ -8,7 +8,6 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   InternalServerErrorException,
   Query,
   Logger,
@@ -16,6 +15,7 @@ import {
 import { UsersService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dto.model';
 import { v4 } from 'uuid';
+import { userServiceErrorMessage } from './user.domain';
 
 @Controller('users')
 export class UsersController {
@@ -28,24 +28,33 @@ export class UsersController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    const maxLimit = 50;
-    const appliedLimit = limit > maxLimit ? maxLimit : limit;
-    const offset = (page - 1) * appliedLimit;
-    const idLogTx = v4();
-    const timestamp = new Date().toISOString();
-    const users = await this.usersService.findAll(
-      offset,
-      appliedLimit,
-      idLogTx,
-      timestamp,
-    );
-    this.logger.log('find all user', idLogTx, timestamp);
+    try {
+      const maxLimit = 50;
+      const appliedLimit = limit > maxLimit ? maxLimit : limit;
+      const offset = (page - 1) * appliedLimit;
+      const idLogTx = v4();
+      const timestamp = new Date().toISOString();
 
-    return {
-      page: page,
-      limit: appliedLimit,
-      users: users,
-    };
+      const users = await this.usersService.findAll(
+        offset,
+        appliedLimit,
+        idLogTx,
+        timestamp,
+      );
+
+      this.logger.log('find all user', idLogTx, timestamp);
+
+      return {
+        page: page,
+        limit: appliedLimit,
+        users: users,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(
+        'Internal server error: ' + err.message,
+      );
+    }
   }
 
   @Get(':id')
@@ -54,13 +63,13 @@ export class UsersController {
     try {
       const idLogTx = v4();
       const timestamp = new Date().toISOString();
-      const user = await this.usersService.findOne(id, idLogTx, timestamp);
-      if (!user) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
+      const result = await this.usersService.findOne(id, idLogTx, timestamp);
+
       this.logger.log('find one user', idLogTx, timestamp);
-      return user;
+
+      return result;
     } catch (err) {
+      console.log(err);
       throw new InternalServerErrorException(
         'Internal server error: ' + err.message,
       );
@@ -73,9 +82,18 @@ export class UsersController {
     try {
       const idLogTx = v4();
       const timestamp = new Date().toISOString();
+
+      const result = await this.usersService.create(
+        createUserDto,
+        idLogTx,
+        timestamp,
+      );
+
       this.logger.log('create user', idLogTx, timestamp);
-      return await this.usersService.create(createUserDto, idLogTx, timestamp);
+
+      return result;
     } catch (err) {
+      console.log(err);
       throw new InternalServerErrorException(
         'Internal server error: ' + err.message,
       );
@@ -88,18 +106,19 @@ export class UsersController {
     try {
       const idLogTx = v4();
       const timestamp = new Date().toISOString();
+
       const updatedUser = await this.usersService.update(
         id,
         idLogTx,
         timestamp,
         updateUserDto,
       );
-      if (!updatedUser) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
+
       this.logger.log('update user', idLogTx, timestamp);
+
       return updatedUser;
     } catch (err) {
+      console.log(err);
       throw new InternalServerErrorException(
         'Internal server error: ' + err.message,
       );
@@ -112,13 +131,17 @@ export class UsersController {
     try {
       const idLogTx = v4();
       const timestamp = new Date().toISOString();
+
       const result = await this.usersService.delete(id, idLogTx, timestamp);
-      if (result === undefined) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
+
       this.logger.log('delete user', idLogTx, timestamp);
+
+      return result;
     } catch (err) {
       console.error(err);
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR,
+      );
     }
   }
 }

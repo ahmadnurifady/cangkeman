@@ -1,7 +1,14 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Users } from './user.model';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto.model';
+import { userServiceErrorMessage } from './user.domain';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +34,9 @@ export class UsersService {
       return this.usersRepository.findAll({ offset: offset, limit: limit });
     } catch (err) {
       console.log(err);
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR + err.message,
+      );
     }
   }
 
@@ -36,10 +46,10 @@ export class UsersService {
     timestamp: string,
   ): Promise<Users> {
     try {
-      const users = await this.usersRepository.findOne({ where: { id: id } });
+      const users = await this.usersRepository.findByPk(id);
 
       if (!users) {
-        return null;
+        throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
       }
       this.logger.log('find one user', idLogTx, timestamp);
       return users;
@@ -54,12 +64,14 @@ export class UsersService {
     timestamp: string,
   ): Promise<Users> {
     try {
-      const checkUser = await Users.findOne({
-        where: { id: createUserDto.id },
-      });
+      const checkUser = await this.findOne(
+        createUserDto.id,
+        idLogTx,
+        timestamp,
+      );
 
       if (checkUser) {
-        throw new Error(`User ${createUserDto.id} already exists`);
+        throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
       }
 
       const newUser = await this.usersRepository.create({
@@ -70,6 +82,9 @@ export class UsersService {
       return newUser;
     } catch (err) {
       console.log(err);
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR + err.message,
+      );
     }
   }
 
@@ -80,29 +95,38 @@ export class UsersService {
     updateUserDto: UpdateUserDto,
   ): Promise<[number, Users[]]> {
     try {
-      this.logger.log('update user', idLogTx, timestamp);
       const findUser = await this.findOne(id, idLogTx, timestamp);
       if (!findUser) {
-        console.log('user not found');
+        throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
       }
       const updateUser = await this.usersRepository.update(updateUserDto, {
         where: { id },
         returning: true,
       });
+      this.logger.log('update user', idLogTx, timestamp);
 
       return updateUser;
     } catch (err) {
       console.log(err);
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR + err.message,
+      );
     }
   }
 
   async delete(id: string, idLogTx: string, timestamp: string): Promise<void> {
     try {
-      this.logger.log('update user', idLogTx, timestamp);
-      const user = await this.usersRepository.findOne({ where: { id: id } });
+      const user = await this.findOne(id, idLogTx, timestamp);
+      if (!user) {
+        throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
+      }
+      this.logger.log('delete user', idLogTx, timestamp);
       await user.destroy();
     } catch (err) {
       console.log(err);
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR + err.message,
+      );
     }
   }
 }
