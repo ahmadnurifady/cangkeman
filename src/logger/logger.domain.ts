@@ -5,4 +5,5 @@ export enum LOGTYPE {
   WARN = 'WARN',
   DEBUG = 'DEBUG',
   VERBOSE = 'VERBOSE',
+  SUCCESS = 'SUCCESS',
 }
