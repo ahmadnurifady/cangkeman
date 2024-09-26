@@ -9,14 +9,12 @@ export const SPOT_LOG_TYPE = {
 
 export const MODULE_LOG_TYPE = {
   USERS: 'USERS',
-  LINENS: 'LINENS',
   TRANSACTION: 'TRANSACTION',
   AUTHMIDDLEWARE: 'AUTHMIDDLEWARE',
   ADMIN: 'ADMIN',
-  REPORT: 'REPORT',
   ORDER: 'ORDER',
   ROLE: 'ROLE',
-  CATEGORY: 'CATEGORY',
+  ARTICLE: 'ARTICLE',
 };
 
 export const logTitleGenerator = (

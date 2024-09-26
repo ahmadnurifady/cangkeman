@@ -33,40 +33,41 @@ export class TransformInterceptor<T>
         data,
       })),
       catchError((err) => {
+        let statusCode: HttpStatus;
+        let message: string;
+
         if (err instanceof HttpException) {
-          const status = err.getStatus();
+          statusCode = err.getStatus();
           const errorResponse = err.getResponse();
 
-          const message =
-            typeof errorResponse === 'string'
-              ? errorResponse
-              : (errorResponse as Record<string, unknown>).message ||
-                'An error occurred';
-
-          return throwError(
-            () =>
-              new HttpException(
-                {
-                  statusCode: status,
-                  message,
-                  data: null,
-                },
-                status,
-              ),
-          );
+          // Pengecekan tipe dan gabungkan message dengan detail error jika ada
+          if (typeof errorResponse === 'string') {
+            message = errorResponse;
+          } else if (
+            typeof errorResponse === 'object' &&
+            'message' in errorResponse
+          ) {
+            message = (errorResponse as Record<string, any>).message as string;
+          } else {
+            message = 'An error occurred';
+          }
         } else {
-          return throwError(
-            () =>
-              new HttpException(
-                {
-                  statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                  message: 'Internal server error',
-                  data: null,
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR,
-              ),
-          );
+          statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+          message = `${err.message || 'Internal server error'}`.trim(); // Gabungkan message dengan stack trace jika ada
         }
+
+        // Mengirimkan response error dengan message yang digabungkan
+        return throwError(
+          () =>
+            new HttpException(
+              {
+                statusCode,
+                message,
+                data: null,
+              },
+              statusCode,
+            ),
+        );
       }),
     );
   }

@@ -7,7 +7,6 @@ import { LOGTYPE } from './logger.domain'; // Definisikan enum LOGTYPE sesuai ke
 export class MyLogger implements LoggerService {
   private logFilePath: string;
   private logFileStream: any;
-  // private timestamp = new Date().toISOString();
 
   private mantapJiwa(message: string, idLogTx: string, timestamp: string) {
     return `[${timestamp}] - ${idLogTx} - + ${message}]`;
@@ -34,16 +33,19 @@ export class MyLogger implements LoggerService {
   }
 
   private writeLogToFile(logType: string, logTitle: string, logMessage: any) {
-    const timestamp = new Date().toISOString();
-    const logData = {
-      timestamp,
-      logType,
-      logTitle,
-      logMessage,
-    };
+    // Hanya simpan log jika logType adalah "ERROR" atau "FATAL"
+    if (logType === 'ERROR' || logType === 'FATAL') {
+      const timestamp = new Date().toISOString();
+      const logData = {
+        timestamp,
+        logType,
+        logTitle,
+        logMessage,
+      };
 
-    // Tulis log ke file
-    this.logFileStream.write(JSON.stringify(logData) + '\n');
+      // Tulis log ke file
+      this.logFileStream.write(JSON.stringify(logData) + '\n');
+    }
   }
 
   log(
@@ -52,11 +54,10 @@ export class MyLogger implements LoggerService {
     timestamp: string,
     ...optionalParams: any[]
   ) {
-    this.writeLogToFile('INFO', message, optionalParams);
     console.log(
       this.mantapJiwa(message, idLogTx, timestamp),
       ...optionalParams,
-    ); // Optional: Log ke console juga
+    ); // Log ke console
   }
 
   error(message: any, ...optionalParams: any[]) {
@@ -65,17 +66,14 @@ export class MyLogger implements LoggerService {
   }
 
   warn(message: any, ...optionalParams: any[]) {
-    this.writeLogToFile('WARN', message, optionalParams);
     console.warn(message, ...optionalParams); // Log warning ke console
   }
 
   debug?(message: any, ...optionalParams: any[]) {
-    this.writeLogToFile('DEBUG', message, optionalParams);
     console.debug(message, ...optionalParams); // Optional: Log debug ke console
   }
 
   verbose?(message: any, ...optionalParams: any[]) {
-    this.writeLogToFile('VERBOSE', message, optionalParams);
     console.log(message, ...optionalParams); // Log verbose ke console
   }
 
