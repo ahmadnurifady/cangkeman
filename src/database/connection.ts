@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
 import { Articles } from 'src/article/article.model';
 import { Users } from 'src/user/user.model';
+import { CoinTransaction } from 'src/coin-transaction/coin.tx.model';
 
 export const databaseProvider = [
   {
@@ -14,7 +15,7 @@ export const databaseProvider = [
         password: process.env.DB_PASSWORD || 'your-password',
         database: process.env.DB_NAME || 'your-database',
       });
-      sequelize.addModels([Users, Articles]);
+      sequelize.addModels([Users, Articles, CoinTransaction]);
       await sequelize.sync();
       return sequelize;
     },

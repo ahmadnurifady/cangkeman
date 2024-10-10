@@ -13,23 +13,20 @@ import {
   articleServiceErrorMessage,
 } from './article.domain';
 import { MyLogger } from 'src/logger/logger';
+import { Sequelize } from 'sequelize-typescript';
+import { userServiceErrorMessage } from 'src/user/user.domain';
 
 @Injectable()
 export class ArticleService {
-  public get articleRepository(): typeof Articles {
-    return this._articleRepository;
-  }
-  public get userRepository(): typeof Users {
-    return this._usersRepository;
-  }
-
   private readonly logger = new MyLogger();
 
   constructor(
     @Inject('ARTICLE_REPOSITORY')
-    private _articleRepository: typeof Articles,
+    private articleRepository: typeof Articles,
     @Inject('USERS_REPOSITORY')
-    private _usersRepository: typeof Users,
+    private usersRepository: typeof Users,
+    @Inject('SEQUELIZE')
+    private readonly sequelize: Sequelize,
   ) {}
 
   // Create Article
@@ -41,6 +38,13 @@ export class ArticleService {
     const findArticle = await this.articleRepository.findByPk(
       createArticleDto.id,
     );
+
+    console.log(createArticleDto.userId);
+    console.log(typeof createArticleDto.userId);
+
+    if (createArticleDto.userId === null || createArticleDto.userId === '') {
+      createArticleDto.userId = '';
+    }
 
     if (findArticle) {
       this.logger.error(
@@ -55,7 +59,7 @@ export class ArticleService {
       );
     }
 
-    const findUser = await this.userRepository.findByPk(
+    const findUser = await this.usersRepository.findByPk(
       createArticleDto.userId,
     );
 
@@ -106,6 +110,34 @@ export class ArticleService {
       throw new NotFoundException('Article not found');
     }
     return article;
+  }
+
+  async changeStatus(id: string): Promise<string> {
+    const t = await this.sequelize.transaction();
+
+    const article = await this.articleRepository.findByPk(id);
+
+    if (!article) {
+      throw new NotFoundException(articleServiceErrorMessage.NOT_FOUND);
+    }
+
+    article.status = !article.status;
+    await article.save({ transaction: t });
+
+    const findUser = await this.usersRepository.findOne({
+      where: { username: article.userName },
+    });
+
+    if (!findUser) {
+      await t.rollback();
+      throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
+    }
+
+    findUser.totalCoin++;
+    await findUser.save({ transaction: t });
+    await t.commit();
+
+    return 'Status article berhasil diubah';
   }
 
   // Update Article

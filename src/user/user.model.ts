@@ -1,6 +1,8 @@
-import { STRING } from 'sequelize';
+import { INTEGER, STRING } from 'sequelize';
 import { Table, Column, Model, HasMany } from 'sequelize-typescript';
 import { Articles } from 'src/article/article.model';
+import { CoinTransaction } from 'src/coin-transaction/coin.tx.model';
+import { RoleUser } from 'src/role-user/role.user';
 
 @Table({
   tableName: 'users',
@@ -16,21 +18,43 @@ export class Users extends Model {
   })
   id: string;
 
-  @Column
+  @Column({
+    type: STRING,
+    field: 'username',
+    unique: true,
+    allowNull: false,
+  })
   userName: string;
 
-  @Column
+  @Column({
+    type: STRING,
+    allowNull: false,
+  })
   email: string;
 
-  @Column
+  @Column({
+    type: STRING,
+    allowNull: false,
+  })
   password: string;
 
-  @Column
-  role: string;
+  @Column({
+    type: STRING,
+    allowNull: false,
+  })
+  role: RoleUser;
 
-  @Column
+  @Column({
+    type: INTEGER,
+    defaultValue: 0,
+    field: 'total_coin',
+    allowNull: false,
+  })
   totalCoin: number;
 
   @HasMany(() => Articles)
   articles: Articles[];
+
+  @HasMany(() => CoinTransaction)
+  coinTransactions: CoinTransaction[];
 }

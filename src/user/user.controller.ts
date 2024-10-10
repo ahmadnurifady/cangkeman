@@ -93,6 +93,50 @@ export class UsersController {
     return result;
   }
 
+  @Put('coin/:id')
+  @HttpCode(HttpStatus.OK)
+  async addCoinUser(@Param('id') id: string) {
+    const idLogTx = v4();
+    const timestamp = new Date().toISOString();
+
+    const result = await this.usersService.addCoinUser(id);
+
+    this.logger.log(
+      LOGTYPE.SUCCESS,
+      idLogTx,
+      timestamp,
+      UserControllerLogTitle.SUCCESS,
+    );
+
+    return result;
+  }
+
+  @Put('new/password/:id')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @Param('id') id: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    const idLogTx = v4();
+    const timestamp = new Date().toISOString();
+
+    const changePassword = await this.usersService.changePassword(
+      id,
+      newPassword,
+      idLogTx,
+      timestamp,
+    );
+
+    this.logger.log(
+      LOGTYPE.SUCCESS,
+      idLogTx,
+      timestamp,
+      UserControllerLogTitle.SUCCESS,
+    );
+
+    return changePassword;
+  }
+
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

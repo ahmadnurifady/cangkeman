@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
@@ -82,6 +83,22 @@ export class ArticleController {
     const timestamp = new Date().toISOString();
 
     const result = await this.articleService.findOne(id);
+    this.logger.log(
+      LOGTYPE.SUCCESS,
+      idLogTx,
+      timestamp,
+      ArticleControllerLogTitle.SUCCESS,
+    );
+
+    return result;
+  }
+
+  @Put('/status/:id')
+  async changeStatus(@Param('id') id: string) {
+    const idLogTx = v4();
+    const timestamp = new Date().toISOString();
+
+    const result = await this.articleService.changeStatus(id);
     this.logger.log(
       LOGTYPE.SUCCESS,
       idLogTx,

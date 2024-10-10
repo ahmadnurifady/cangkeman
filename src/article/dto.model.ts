@@ -1,6 +1,6 @@
 export class CreateArticleDto {
   id: string;
-  userId: string;
+  userId?: string;
   userName: string;
   title: string;
   content?: string;

@@ -15,6 +15,7 @@ export const MODULE_LOG_TYPE = {
   ORDER: 'ORDER',
   ROLE: 'ROLE',
   ARTICLE: 'ARTICLE',
+  COIN_TRANSACTION: 'COIN_TRANSACTION',
 };
 
 export const logTitleGenerator = (

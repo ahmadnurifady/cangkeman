@@ -1,18 +1,18 @@
-import { STRING } from 'sequelize';
+import { INTEGER, STRING } from 'sequelize';
 import {
-  Table,
-  Column,
-  Model,
-  ForeignKey,
   BelongsTo,
+  Column,
+  ForeignKey,
+  Table,
+  Model,
 } from 'sequelize-typescript';
 import { Users } from 'src/user/user.model';
 
 @Table({
-  tableName: 'articles',
+  tableName: 'coin_transactions',
   timestamps: true,
 })
-export class Articles extends Model {
+export class CoinTransaction extends Model {
   @Column({
     primaryKey: true,
     unique: true,
@@ -24,29 +24,26 @@ export class Articles extends Model {
 
   @ForeignKey(() => Users)
   @Column({
-    allowNull: true,
+    allowNull: false,
     field: 'user_id',
   })
   userId: string;
 
   @Column({
+    type: INTEGER,
+    field: 'total_coin',
     allowNull: false,
-    field: 'username',
+    defaultValue: 0,
   })
-  userName: string;
+  totalCoin: number;
 
   @Column({
+    type: INTEGER,
+    field: 'total_amount',
     allowNull: false,
+    defaultValue: 0,
   })
-  title: string;
-
-  @Column
-  content: string;
-
-  @Column({
-    allowNull: false,
-  })
-  status: boolean;
+  totalAmount: number;
 
   @BelongsTo(() => Users)
   users: Users;

@@ -13,15 +13,11 @@ import { MyLogger } from 'src/logger/logger';
 
 @Injectable()
 export class UsersService {
-  public get usersRepository(): typeof Users {
-    return this._usersRepository;
-  }
-
   private readonly logger = new MyLogger();
 
   constructor(
     @Inject('USERS_REPOSITORY')
-    private _usersRepository: typeof Users,
+    private usersRepository: typeof Users,
   ) {}
 
   async findAll(
@@ -93,6 +89,54 @@ export class UsersService {
     });
 
     return newUser;
+  }
+
+  async changePassword(
+    id: string,
+    newPassword: string,
+    idLogTx: string,
+    timestamp: string,
+  ): Promise<string> {
+    const findUser = await this.usersRepository.findByPk(id);
+
+    if (!findUser) {
+      throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 15);
+
+    const [affectedRows] = await this.usersRepository.update(
+      { password: hashedPassword },
+      { where: { id: id }, fields: ['password'] },
+    );
+
+    if (affectedRows === 0) {
+      this.logger.log(
+        userServiceErrorMessage.GENERAL_ERROR,
+        idLogTx,
+        timestamp,
+        UserServiceLogTitle.ERROR,
+      );
+      throw new InternalServerErrorException(
+        userServiceErrorMessage.GENERAL_ERROR,
+      );
+    }
+
+    return 'CHANGE PASSWORD SUCCESS';
+  }
+
+  async addCoinUser(id: string): Promise<string> {
+    const user = await this.usersRepository.findByPk(id);
+
+    if (!user) {
+      throw new NotFoundException(userServiceErrorMessage.NOT_FOUND);
+    }
+
+    user.totalCoin++;
+
+    await user.save();
+
+    return '';
   }
 
   async update(
