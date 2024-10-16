@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dto.model';
@@ -55,13 +56,15 @@ export class UsersController {
     };
   }
 
-  @Get(':id')
+  @Get('/details')
   @HttpCode(HttpStatus.OK)
-  async findOne(@Param('id') id: string) {
+  async getUserDetails(@Request() req) {
     const idLogTx = v4();
     const timestamp = new Date().toISOString();
 
-    const result = await this.usersService.findOne(id, idLogTx, timestamp);
+    const userId = req.user.userId;
+
+    const result = await this.usersService.findOne(userId, idLogTx, timestamp);
     this.logger.log(
       LOGTYPE.SUCCESS,
       idLogTx,
@@ -175,6 +178,22 @@ export class UsersController {
       UserControllerLogTitle.SUCCESS,
     );
 
+    return result;
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
+    const idLogTx = v4();
+    const timestamp = new Date().toISOString();
+
+    const result = await this.usersService.findOne(id, idLogTx, timestamp);
+    this.logger.log(
+      LOGTYPE.SUCCESS,
+      idLogTx,
+      timestamp,
+      UserControllerLogTitle.SUCCESS,
+    );
     return result;
   }
 }

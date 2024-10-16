@@ -7,16 +7,17 @@ import { CreateUserDto } from 'src/user/dto.model';
 import { Public } from 'src/utils/public.decorator';
 
 @Controller('auth')
-@Public()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @Post('login')
   @UseGuards(LocalGuard)
   async login(@Req() req: Request) {
     return req.user;
   }
 
+  @Public()
   @Post('register')
   async register(@Body() req: CreateUserDto) {
     const result = await this.authService.RegisterUser(req);

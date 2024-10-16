@@ -19,6 +19,8 @@ export class AuthService {
     if (!findUser) {
       return null;
     }
+    console.log('ini request password', passwordUser);
+    console.log('ini password user database', findUser.password);
     const isMatch = bcrypt.compareSync(passwordUser, findUser.password);
     if (!isMatch) {
       throw new BadRequestException('password salah');
@@ -38,8 +40,8 @@ export class AuthService {
     }
 
     const createUser = await this.userRepo.create({
-      password: bcrypt.hash(payload.password, 15),
       ...payload,
+      password: await bcrypt.hash(payload.password, 15),
     });
 
     return createUser;
