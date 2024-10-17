@@ -1,6 +1,7 @@
 export class CreateUserDto {
   id: string;
   username: string;
+  fullname: string;
   email: string;
   password: string;
   role: string;
@@ -9,7 +10,8 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
-  userName?: string;
+  username?: string;
+  ullname?: string;
   email?: string;
   role?: string;
   totalCoin?: number;

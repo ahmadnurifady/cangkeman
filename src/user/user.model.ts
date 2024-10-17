@@ -24,7 +24,15 @@ export class Users extends Model {
     unique: true,
     allowNull: false,
   })
-  userName: string;
+  username: string;
+
+  @Column({
+    type: STRING,
+    field: 'fullname',
+    unique: true,
+    allowNull: false,
+  })
+  fullname: string;
 
   @Column({
     type: STRING,
