@@ -31,7 +31,7 @@ export class AuthService {
 
   async RegisterUser(payload: CreateUserDto): Promise<Users> {
     const isExist = await this.userRepo.findOne({
-      where: { username: payload.userName },
+      where: { username: payload.username },
     });
     if (isExist) {
       throw new BadRequestException(

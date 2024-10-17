@@ -45,12 +45,34 @@ export class Users extends Model {
   role: RoleUser;
 
   @Column({
+    type: STRING,
+    allowNull: false,
+  })
+  city: string;
+
+  @Column({
     type: INTEGER,
     defaultValue: 0,
     field: 'total_coin',
     allowNull: false,
   })
   totalCoin: number;
+
+  @Column({
+    type: INTEGER,
+    defaultValue: 0,
+    field: 'coin_this_year',
+    allowNull: true,
+  })
+  coinThisYear: number;
+
+  @Column({
+    type: INTEGER,
+    defaultValue: 0,
+    field: 'total_post',
+    allowNull: true,
+  })
+  totalPost: number;
 
   @HasMany(() => Articles)
   articles: Articles[];

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CoinTransaction } from './coin.tx.model';
 import { MyLogger } from 'src/logger/logger';
-import { CreateCoinTxDto } from 'src/utils/dto.model';
+import { CreateCoinTxDto } from 'src/coin-transaction/dto.model';
 import { Users } from 'src/user/user.model';
 import { coinTxServiceErrorMessage } from './coin.tx.domain';
 import { Sequelize } from 'sequelize-typescript';

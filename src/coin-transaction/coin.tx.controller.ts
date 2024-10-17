@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { CoinTransactionService } from './coin.tx.service';
-import { CreateCoinTxDto } from 'src/utils/dto.model';
+import { CreateCoinTxDto } from 'src/coin-transaction/dto.model';
 import { MyLogger } from 'src/logger/logger';
 import { CoinTxControllerLogTitle } from './coin.tx.domain';
 import { LOGTYPE } from 'src/logger/logger.domain';

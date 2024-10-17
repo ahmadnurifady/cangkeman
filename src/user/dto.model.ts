@@ -1,10 +1,11 @@
 export class CreateUserDto {
   id: string;
-  userName: string;
+  username: string;
   email: string;
   password: string;
   role: string;
   totalCoin: number;
+  city: string;
 }
 
 export class UpdateUserDto {
@@ -12,4 +13,7 @@ export class UpdateUserDto {
   email?: string;
   role?: string;
   totalCoin?: number;
+  city?: string;
+  coinThisYear?: number;
+  totalPost?: number;
 }
