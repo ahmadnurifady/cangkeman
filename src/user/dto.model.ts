@@ -11,7 +11,7 @@ export class CreateUserDto {
 
 export class UpdateUserDto {
   username?: string;
-  ullname?: string;
+  fullname?: string;
   email?: string;
   role?: string;
   totalCoin?: number;
